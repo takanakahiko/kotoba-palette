@@ -1,6 +1,6 @@
 # ことばパレット
 
-> ことばの色を知りましょう
+> あなたが好きなものは，どんな色をしてますか？
 
 ![momoyan](https://raw.githubusercontent.com/takanakahiko/kotoba-palette/master/momoyan.png?)
 
