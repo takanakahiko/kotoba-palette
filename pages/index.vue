@@ -9,8 +9,8 @@
         <a href="https://twitter.com/intent/tweet?original_referer=http%3A%2F%2Flocalhost%3A3000%2F&ref_src=twsrc%5Etfw&text=ことばパレット%20%23kotoba_palette&tw_p=tweetbutton&url=https%3A%2F%2Fkotoba-palette.herokuapp.com%2F" target="_blank" class="button--green">
           Share
         </a>
-        <a href="https://github.com/takanakahiko/word2colors" target="_blank" class="button--grey" >
-          GitHub
+        <a href="https://twitter.com/takanakahiko" target="_blank" class="button--grey" >
+          つくったひと
         </a>
       </div>
     </div>
