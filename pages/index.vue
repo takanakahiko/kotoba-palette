@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <ForkMeOnGithub />
     <div>
       <h1 class="title">ことばパレット</h1>
       <input type="text" placeholder="word" v-model="word" />
@@ -20,10 +21,12 @@
 import debounce from 'lodash/debounce'
 
 import ColorsViewer from '~/components/ColorsViewer.vue'
+import ForkMeOnGithub from '~/components/ForkMeOnGithub.vue'
+
 
 export default {
   components: {
-    ColorsViewer
+    ColorsViewer,ForkMeOnGithub
   },
   data: function(){
     return {
