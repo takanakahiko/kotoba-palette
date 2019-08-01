@@ -49,10 +49,10 @@ export default {
       try {
         const ret = await fetch('/api?word=' + this.word)
         const retJson = await ret.json()
-        if(retJson.error) throw Error
+        if(retJson.error) throw Error(retJson.error)
         this.colors = Object.keys(retJson).map(key => retJson[key].rgb)
       } catch (error) {
-        this.$toast.error('エラーになりました')
+        this.$toast.error('エラーになりました : ' + error)
       }
       this.$nuxt.$loading.finish()
     }

@@ -13,7 +13,7 @@ app.get('/', async (req, res) =>{
     res.json(palette)
   } catch (error) {
     res.status(500)
-    res.json({error: 'error'})
+    res.json({error: error.toString()})
   }
 })
 
