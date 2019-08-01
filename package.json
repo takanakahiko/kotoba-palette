@@ -4,6 +4,9 @@
   "description": "What your color?",
   "author": "takanakahiko",
   "private": true,
+  "engines": {
+    "node": "11.9.0"
+  },
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
