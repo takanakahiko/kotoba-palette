@@ -1,7 +1,7 @@
 
 export default {
   mode: 'universal',
-  serverMiddleware: ['~/api'],
+  serverMiddleware: ['~/api','redirect-ssl'],
   head: {
     title: process.env.npm_package_name || '',
     meta: [
