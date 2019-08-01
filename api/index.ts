@@ -10,9 +10,7 @@ const app = express()
 
 app.get('/', async (req, res) =>{
   try {
-    console.log('ho')
     const imageResults = await imageSearchApiClient.imagesOperations.search(req.query.word);
-    console.log('wa')
     if(imageResults == null) throw Error('image not found')
     const pureImages = imageResults.value.filter(img => img.encodingFormat === 'jpeg' || img.encodingFormat === 'png')
     const palette = await Vibrant.from(pureImages[0].contentUrl).getPalette()
