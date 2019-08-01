@@ -6,8 +6,8 @@
       <input type="text" placeholder="word" v-model="word" />
       <ColorsViewer :value="colors" />
       <div class="links">
-        <a href="https://twitter.com/intent/tweet?original_referer=http%3A%2F%2Flocalhost%3A3000%2F&ref_src=twsrc%5Etfw&text=ことばパレット&tw_p=tweetbutton&url=https%3A%2F%2Fkotoba-palette.herokuapp.com%2F" target="_blank" class="button--green">
-          Share(Getting Ready...)
+        <a href="https://twitter.com/intent/tweet?original_referer=http%3A%2F%2Flocalhost%3A3000%2F&ref_src=twsrc%5Etfw&text=ことばパレット%20%23kotoba-palette&tw_p=tweetbutton&url=https%3A%2F%2Fkotoba-palette.herokuapp.com%2F" target="_blank" class="button--green">
+          Share
         </a>
         <a href="https://github.com/takanakahiko/word2colors" target="_blank" class="button--grey" >
           GitHub
