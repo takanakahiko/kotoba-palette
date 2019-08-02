@@ -1,5 +1,5 @@
 <template>
-  <div id="image-picker-palette">
+  <div id="image-picker-palette" :class="{ active: isActive }">
     <div v-for="rgb in value" :key="rgb | rgb2code" :style="rgb | rgb2style">
       <span class="image-picker-palette-hex" >{{ rgb | rgb2code }}</span>
     </div>
@@ -22,6 +22,11 @@ export default {
       if(rgb[0] == -1) return `background: rgb(255, 255, 255);`
       return `background: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]});`
     },
+  },
+  computed: {
+    isActive(){
+      return this.value && this.value.length !== 0
+    }
   }
 }
 </script>
@@ -33,8 +38,11 @@ export default {
   height: 50px;
   border-radius: 5px;
   overflow: hidden;
-  border: 1px gray solid;
   display: flex;
+}
+
+#image-picker-palette.active{
+  border: 1px gray solid;
 }
 
 #image-picker-palette div {
