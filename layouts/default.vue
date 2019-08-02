@@ -4,7 +4,9 @@
   </div>
 </template>
 
-<style>
+<style lang="scss">
+@import "~/assets/display.scss";
+
 html {
   font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -31,6 +33,9 @@ html {
   color: #3b8070;
   text-decoration: none;
   padding: 10px 30px;
+  @include mobile {
+    padding: 5px 15px;
+  }
 }
 
 .button--green:hover {
@@ -45,6 +50,9 @@ html {
   color: #35495e;
   text-decoration: none;
   padding: 10px 30px;
+  @include mobile {
+    padding: 5px 15px;
+  }
   margin-left: 15px;
 }
 
