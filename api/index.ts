@@ -16,6 +16,7 @@ app.get('/', async (req, res) =>{
     const palette = await Vibrant.from(pureImages[0].contentUrl).getPalette()
     res.json(palette)
   } catch (error) {
+    console.log(error.toString())
     res.status(500)
     res.json({error: error.toString()})
   }
