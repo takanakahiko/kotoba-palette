@@ -60,14 +60,21 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import "~/assets/display.scss";
+
 input {
   border: 0;
   border-bottom: 2px solid #5B5B5B;
-  width: 100%;
+  width: 70%;
   font-size: 30px;
   line-height: 35px;
   height: 70px;
+  @include mobile {
+    font-size: 15px;
+    line-height: 20px;
+    height: 35px;
+  }
   text-align: center;
   padding: 10px;
   background: transparent;
@@ -97,6 +104,9 @@ input::placeholder {
   display: block;
   font-weight: 300;
   font-size: 5rem;
+  @include mobile {
+    font-size: 2rem;
+  }
   color: #35495e;
   letter-spacing: 1px;
 }

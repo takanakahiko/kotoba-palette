@@ -1,0 +1,26 @@
+$breakpoint-mq: 768px;
+$breakpoint-md: 960px;
+
+@mixin mq-md {
+  @media screen and (max-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media screen and (max-width: $breakpoint-mq) {
+    @content;
+  }
+}
+
+@mixin not-mobile {
+  @media screen and (min-width: $breakpoint-mq) {
+    @content;
+  }
+}
+
+@mixin wide-screen {
+  @media screen and (min-width: $breakpoint-md) {
+    @content;
+  }
+}

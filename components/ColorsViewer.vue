@@ -31,11 +31,18 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "~/assets/display.scss";
+
 #image-picker-palette {
   margin: 5px;
   margin-top: 25px;
   height: 50px;
+  line-height: 53px;
+  @include mobile {
+    height: 30px;
+    line-height: 33px;
+  }
   border-radius: 5px;
   overflow: hidden;
   display: flex;
@@ -52,6 +59,9 @@ export default {
   text-align: center;
   transition: width .3s ease;
   position: relative;
-  line-height: 53px;
+  @include mobile {
+    font-size: 10px;
+    padding: 2px;
+  }
 }
 </style>
