@@ -111,7 +111,7 @@ export default {
       }
       const formData = new FormData();
       const getCanvasBlob = (canvas) => {
-        return new Promise((resolve, reject) => canvas.toBlob(resolve))
+        return new Promise((resolve, reject) => canvas.toBlob(resolve, 'image/png'))
       }
       formData.append('image', await getCanvasBlob(canvas));
       const options = {
@@ -131,7 +131,7 @@ export default {
           url: `https://kotoba-palette.herokuapp.com?id=${retJson.id}&word=${encodeURIComponent(this.word)}&colors=${this.colors.map(rgb2hex).join(',')}`,
           hashtags: ['kotoba_palette']
         });
-        window.open(tweetLink)
+        if(!window.open(tweetLink)) window.location.href = tweetLink;
       } catch (error) {
         console.log(error)
         this.$toast.error('エラーになりました : ' + error)
