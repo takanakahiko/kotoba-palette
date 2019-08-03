@@ -51,7 +51,7 @@ export default {
     }
     return {
       id : query.id,
-      word : query.word,
+      word : (query.word) ? decodeURIComponent(query.word) : undefined,
       colors : (query.colors) ? query.colors.split(',').map(hexToRgb) : undefined
     }
   },
@@ -128,7 +128,7 @@ export default {
         }
         const tweetLink = twitterShare({
           text: 'ことばパレット',
-          url: `https://kotoba-palette.herokuapp.com?id=${retJson.id}&word=${this.word}&colors=${this.colors.map(rgb2hex).join(',')}`,
+          url: `https://kotoba-palette.herokuapp.com?id=${retJson.id}&word=${encodeURIComponent(this.word)}&colors=${this.colors.map(rgb2hex).join(',')}`,
           hashtags: ['kotoba_palette']
         });
         window.open(tweetLink)
