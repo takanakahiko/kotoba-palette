@@ -7,7 +7,7 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '単語を色に変換すっぞ！！！！！！' }
+      { hid: 'description', name: 'description', content: 'あなたが好きなものは，どんな色をしてますか？' }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }

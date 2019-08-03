@@ -57,11 +57,11 @@ export default {
   },
   head () {
     const meta = [
-      { hid: 'og:site_name', property: 'og:site_name', content: 'イベントページからツイッターのリストを作るやつ' },
+      { hid: 'og:site_name', property: 'og:site_name', content: 'あなたが好きなものは，どんな色をしてますか？' },
       { hid: 'og:type', property: 'og:type', content: 'website' },
       { hid: 'og:url', property: 'og:url', content: 'https://kotoba-palette.herokuapp.com' },
-      { hid: 'og:title', property: 'og:title', content: 'イベントページからツイッターのリストを作るやつ' },
-      { hid: 'og:description', property: 'og:description', content: 'connpass の URL から Twitter のリストを自動生成します' },
+      { hid: 'og:title', property: 'og:title', content: 'ことばパレット' },
+      { hid: 'og:description', property: 'og:description', content: 'あなたが好きなものは，どんな色をしてますか？' },
     ]
     if(this.id){
       meta.push({ hid: 'og:image', property: 'og:image', content: 'https://kotoba-palette.herokuapp.com/api/ogpImage?id=' + this.id })
