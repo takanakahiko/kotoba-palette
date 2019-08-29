@@ -20,8 +20,19 @@ app.get('/getColors', async (req, res) =>{
     if(imageResults == null || imageResults.value.length == 0) throw Error('image not found')
     const pureImages = imageResults.value.filter(img => img.encodingFormat === 'jpeg' || img.encodingFormat === 'png')
     if(!pureImages[0].contentUrl) throw Error('image not found')
-    const palette = await Vibrant.from(pureImages[0].contentUrl).getPalette()
-    res.json(palette)
+    for(let i = 0; i < 5; i++ ){
+      const contentUrl = pureImages[i].contentUrl
+      if(!contentUrl) throw Error('image not found')
+      try {
+        const palette = await Vibrant.from(contentUrl).getPalette()
+        res.json(palette)
+        break;
+      } catch (error2) {
+        console.log(`${i} : fetch error`)
+        console.log(error2.toString())
+        if(i==4) throw error2
+      }
+    }
   } catch (error) {
     console.log(error.toString())
     res.status(500)
