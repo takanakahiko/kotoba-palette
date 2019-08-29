@@ -13,7 +13,12 @@ export default {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
-  loading: { color: '#fff' },
+  loading: {
+    color: 'green',
+    height: '10px',
+    duration: 1000,
+    continuous: true
+  },
   modules: [
     '@nuxtjs/toast',
   ]
