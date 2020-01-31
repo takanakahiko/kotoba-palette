@@ -1,6 +1,7 @@
 
 export default {
   mode: 'universal',
+  buildModules: ['@nuxt/typescript-build'],
   serverMiddleware: ['~/api','redirect-ssl'],
   head: {
     title: process.env.npm_package_name || '',
