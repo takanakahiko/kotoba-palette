@@ -16,7 +16,7 @@ const imageSearchApiClient = new ImageSearchAPIClient(credentials);
 
 app.get('/getColors', async (req, res) =>{
   try {
-    const imageResults = await imageSearchApiClient.imagesOperations.search(req.query.word);
+    const imageResults = await imageSearchApiClient.imagesOperations.search(req.query.word!.toString());
     if(imageResults == null || imageResults.value.length == 0) throw Error('image not found')
     const pureImages = imageResults.value.filter(img => img.encodingFormat === 'jpeg' || img.encodingFormat === 'png')
     if(!pureImages[0].contentUrl) throw Error('image not found')
@@ -69,9 +69,9 @@ app.post('/saveOgpImage', upload.single('image'), async (req, res) =>{
 
 app.get('/ogpImage', async (req, res) =>{
   try {
-    const params = {
+    const params: AWS.S3.GetObjectRequest = {
       Bucket: process.env.AWS_BUCKET_NAME!,
-      Key: req.query.id
+      Key: req.query.id!.toString(),
     }
     const ret = await s3.getObject(params).promise();
     res.contentType(ret.ContentType!);
