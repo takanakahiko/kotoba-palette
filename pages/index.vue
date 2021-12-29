@@ -127,7 +127,7 @@ export default {
           return Math.floor((1 << 24) + (rgb[0] << 16) + (rgb[1] << 8) + rgb[2]).toString(16).slice(1);
         }
         const tweetLink = twitterShare({
-          text: 'ことばパレット',
+          text: `ことばパレットで「${this.word}」の色を調べてみました。 `,
           url: `https://kotoba-palette.herokuapp.com?id=${retJson.id}&word=${encodeURIComponent(this.word)}&colors=${this.colors.map(rgb2hex).join(',')}`,
           hashtags: ['kotoba_palette']
         });
