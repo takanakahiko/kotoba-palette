@@ -6,9 +6,9 @@
       <input type="text" placeholder="word" v-model="word" />
       <ColorsViewer :value="colors" />
       <div class="links">
-        <a @click="share" target="_blank" class="button--green">
+        <button type="button" @click="share" class="button--green">
           シェア
-        </a>
+        </button>
         <a href="https://twitter.com/takanakahiko" target="_blank" class="button--grey" >
           つくったひと
         </a>
