@@ -11,8 +11,8 @@
     "dev": "nuxt",
     "build": "nuxt build",
     "generate": "nuxt generate",
-    "start": "nuxt start",
-    "heroku-postbuild": "npm run build",
+    "start": "NODE_OPTIONS=--max-old-space-size=1024 nuxt start",
+    "heroku-postbuild": "NODE_OPTIONS=--max-old-space-size=1024 npm run build",
     "deploy": "git push heroku master"
   },
   "dependencies": {
