@@ -127,9 +127,8 @@ export default {
           return Math.floor((1 << 24) + (rgb[0] << 16) + (rgb[1] << 8) + rgb[2]).toString(16).slice(1);
         }
         const tweetLink = twitterShare({
-          text: `ことばパレットで「${this.word}」の色を調べてみました。 `,
+          text: `ことばパレットで「${this.word}」の色を調べてみました。 #kotoba_palette`,
           url: `https://kotoba-palette.herokuapp.com?id=${retJson.id}&word=${encodeURIComponent(this.word)}&colors=${this.colors.map(rgb2hex).join(',')}`,
-          hashtags: ['kotoba_palette']
         });
         if(!window.open(tweetLink)) window.location.href = tweetLink;
       } catch (error) {
