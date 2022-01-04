@@ -20,7 +20,7 @@ export default {
     },
     rgb2style: function(rgb){
       if(rgb[0] == -1) return `background: rgb(255, 255, 255);`
-      return `color:${(rgb[0]+rgb[1]+rgb[2])/3 > 128 ? 'black' : 'white'} ;background: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]});`
+      return `color:${(rgb[0]+rgb[1]+rgb[2])/3 > 128 ? 'black' : 'white'}; background: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]});`
     },
   },
   computed: {
