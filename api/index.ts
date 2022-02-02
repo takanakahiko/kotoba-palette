@@ -11,34 +11,34 @@ const app = express()
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 
-// const credentials = new CognitiveServicesCredentials(process.env.API_KEY!);
-// const imageSearchApiClient = new ImageSearchAPIClient(credentials);
+const credentials = new CognitiveServicesCredentials(process.env.API_KEY!);
+const imageSearchApiClient = new ImageSearchAPIClient(credentials);
 
-// app.get('/getColors', async (req, res) =>{
-//   try {
-//     const imageResults = await imageSearchApiClient.imagesOperations.search(req.query.word!.toString());
-//     if(imageResults == null || imageResults.value.length == 0) throw Error('image not found')
-//     const pureImages = imageResults.value.filter(img => img.encodingFormat === 'jpeg' || img.encodingFormat === 'png')
-//     if(!pureImages[0].contentUrl) throw Error('image not found')
-//     for(let i = 0; i < 5; i++ ){
-//       const contentUrl = pureImages[i].contentUrl
-//       if(!contentUrl) throw Error('image not found')
-//       try {
-//         const palette = await Vibrant.from(contentUrl).getPalette()
-//         res.json(palette)
-//         break;
-//       } catch (error2) {
-//         console.log(`${i} : fetch error`)
-//         console.log(error2.toString())
-//         if(i==4) throw error2
-//       }
-//     }
-//   } catch (error) {
-//     console.log(error.toString())
-//     res.status(500)
-//     res.json({error: error.toString()})
-//   }
-// })
+app.get('/getColors', async (req, res) =>{
+  try {
+    const imageResults = await imageSearchApiClient.imagesOperations.search(req.query.word!.toString());
+    if(imageResults == null || imageResults.value.length == 0) throw Error('image not found')
+    const pureImages = imageResults.value.filter(img => img.encodingFormat === 'jpeg' || img.encodingFormat === 'png')
+    if(!pureImages[0].contentUrl) throw Error('image not found')
+    for(let i = 0; i < 5; i++ ){
+      const contentUrl = pureImages[i].contentUrl
+      if(!contentUrl) throw Error('image not found')
+      try {
+        const palette = await Vibrant.from(contentUrl).getPalette()
+        res.json(palette)
+        break;
+      } catch (error2) {
+        console.log(`${i} : fetch error`)
+        console.log(error2.toString())
+        if(i==4) throw error2
+      }
+    }
+  } catch (error) {
+    console.log(error.toString())
+    res.status(500)
+    res.json({error: error.toString()})
+  }
+})
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
