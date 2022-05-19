@@ -5,24 +5,35 @@ import { CognitiveServicesCredentials } from 'ms-rest-azure'
 import cors from 'cors'
 import AWS from 'aws-sdk'
 import multer from 'multer'
+import gis from 'g-i-s'
 
 const app = express()
 
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 
-const credentials = new CognitiveServicesCredentials(process.env.API_KEY!);
-const imageSearchApiClient = new ImageSearchAPIClient(credentials);
+// const credentials = new CognitiveServicesCredentials(process.env.API_KEY!);
+// const imageSearchApinClient = new ImageSearchAPIClient(credentials);
+
+interface FetchImageResult {url: string, width: number, height: number}
+const fetchImage = (word: string) => new Promise<FetchImageResult[]>((resolve, reject) => {
+  gis(word, (error, results: FetchImageResult[]) => {
+    if(error) reject(error)
+    resolve(results)
+  });
+});
 
 app.get('/getColors', async (req, res) =>{
   try {
-    const imageResults = await imageSearchApiClient.imagesOperations.search(req.query.word!.toString());
-    if(imageResults == null || imageResults.value.length == 0) throw Error('image not found')
-    const pureImages = imageResults.value.filter(img => img.encodingFormat === 'jpeg' || img.encodingFormat === 'png')
-    if(!pureImages[0].contentUrl) throw Error('image not found')
-    for(let i = 0; i < 5; i++ ){
-      const contentUrl = pureImages[i].contentUrl
-      if(!contentUrl) throw Error('image not found')
+    const imageResults = await fetchImage(req.query.word!.toString())
+    if(imageResults == null || imageResults.length == 0) throw Error('image not found')
+    for(const i in imageResults) {
+      const contentUrl = imageResults[i].url
+      console.log(contentUrl)
+      if(!contentUrl.includes('.jpeg') && !contentUrl.includes('.jpg') && !contentUrl.includes('.png')){
+        console.log(`${i} : image is not jpeg or jpg or png`)
+        continue
+      }
       try {
         const palette = await Vibrant.from(contentUrl).getPalette()
         res.json(palette)
@@ -30,7 +41,6 @@ app.get('/getColors', async (req, res) =>{
       } catch (error2) {
         console.log(`${i} : fetch error`)
         console.log(error2.toString())
-        if(i==4) throw error2
       }
     }
   } catch (error) {
@@ -59,7 +69,7 @@ app.post('/saveOgpImage', upload.single('image'), async (req, res) =>{
       ACL: "public-read"
     }
     const ret = await s3.upload(params).promise();
-    res.json({id:objectKey})
+    res.json({id:"objectKey"})
   } catch (error) {
     console.log(error.toString())
     res.status(500)

@@ -2,7 +2,7 @@
 export default {
   mode: 'universal',
   buildModules: ['@nuxt/typescript-build'],
-  serverMiddleware: ['~/api','redirect-ssl', '~/server-middleware/redirect'],
+  serverMiddleware: ['~/api',/*'redirect-ssl',*/ '~/server-middleware/redirect'],
   head: {
     title: process.env.npm_package_name || '',
     meta: [
