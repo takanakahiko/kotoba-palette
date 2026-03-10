@@ -34,29 +34,13 @@ const loading = ref(false);
 const queryId = (route.query.id as string) || "";
 const queryWord = route.query.word ? decodeURIComponent(route.query.word as string) : "";
 
-// IDがある場合はKVからデータを復元
-let initialWord = queryWord;
-let initialColors: Array<[number, number, number]> = [];
-
-if (queryId) {
-  const { data } = await useAsyncData(`result-${queryId}`, () =>
-    $fetch<{ word: string; colors: Array<[number, number, number]> }>("/api/getResult", {
-      query: { id: queryId },
-    }),
-  );
-  if (data.value) {
-    initialWord = data.value.word;
-    initialColors = data.value.colors;
-  }
-}
-
-const word = ref(initialWord);
-const colors = ref<Array<[number, number, number]>>(initialColors);
+const word = ref(queryWord);
+const colors = ref<Array<[number, number, number]>>([]);
 const resultId = ref(queryId);
 
-// SSRでデータ取得に失敗した場合、クライアント側でフォールバック取得する
+// IDがある場合はクライアント側でKVからデータを復元
 onMounted(async () => {
-  if (queryId && colors.value.length === 0) {
+  if (queryId) {
     loading.value = true;
     try {
       const result = await $fetch<{ word: string; colors: Array<[number, number, number]> }>("/api/getResult", {
@@ -68,6 +52,7 @@ onMounted(async () => {
       }
     } catch (e) {
       console.error("Failed to load shared result:", e);
+      toast.error("共有データの読み込みに失敗しました");
     } finally {
       loading.value = false;
     }
