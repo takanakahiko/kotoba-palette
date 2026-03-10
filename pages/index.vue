@@ -2,14 +2,20 @@
   <div class="container">
     <ForkMeOnGithub />
     <div>
-      <h1 class="title">ことばパレット</h1>
-      <input type="text" placeholder="word" v-model="word" />
+      <h1 class="title"><img src="/logo.svg" alt="ことばパレット" class="logo" /></h1>
+      <form @submit.prevent="getColors" class="search-form">
+        <input type="text" placeholder="言葉を入力" v-model="word" />
+        <button type="submit" class="search-button" :disabled="!word || loading">
+          <span v-if="loading" class="spinner" />
+          <span v-else>🎨</span>
+        </button>
+      </form>
       <ColorsViewer :value="colors" />
       <div class="links">
-        <button type="button" @click="share" class="button--green">
+        <button type="button" @click="share" class="button--green" :disabled="colors.length === 0">
           シェア
         </button>
-        <a href="https://twitter.com/takanakahiko" target="_blank" class="button--grey" >
+        <a href="https://twitter.com/takanakahiko" target="_blank" class="button--grey">
           つくったひと
         </a>
       </div>
@@ -17,136 +23,98 @@
   </div>
 </template>
 
-<script>
-import debounce from 'lodash/debounce'
-import twitterShare from 'twitter-share'
+<script setup lang="ts">
+import { ref } from "vue";
+import { useToast } from "~/composables/useToast";
 
-import ColorsViewer from '~/components/ColorsViewer.vue'
-import ForkMeOnGithub from '~/components/ForkMeOnGithub.vue'
+const route = useRoute();
+const toast = useToast();
+const loading = ref(false);
 
+const queryId = (route.query.id as string) || "";
+const queryWord = route.query.word ? decodeURIComponent(route.query.word as string) : "";
 
-export default {
-  components: {
-    ColorsViewer,ForkMeOnGithub
-  },
-  data: function(){
-    return {
-      word: '',
-      colors: [],
-      id: null
-    }
-  },
-  watch: {
-    word: function () {
-      this.debouncedGetColors()
-    }
-  },
-  created: function(){
-    this.debouncedGetColors = debounce(this.getColors, 500)
-  },
-  asyncData: function({query}){
-    const hexToRgb = (hex) => {
-      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)]
-    }
-    return {
-      id : query.id,
-      word : (query.word) ? decodeURIComponent(query.word) : undefined,
-      colors : (query.colors) ? query.colors.split(',').map(hexToRgb) : undefined
-    }
-  },
-  head () {
-    const meta = [
-      { hid: 'og:site_name', property: 'og:site_name', content: 'あなたが好きなものは，どんな色をしてますか？' },
-      { hid: 'og:type', property: 'og:type', content: 'website' },
-      { hid: 'og:url', property: 'og:url', content: 'https://kotoba-palette.herokuapp.com' },
-      { hid: 'og:title', property: 'og:title', content: 'ことばパレット' },
-      { hid: 'og:description', property: 'og:description', content: 'あなたが好きなものは，どんな色をしてますか？' },
-    ]
-    if(this.id){
-      meta.push({ hid: 'og:image', property: 'og:image', content: 'https://kotoba-palette.herokuapp.com/api/ogpImage?id=' + this.id })
-      meta.push({ name: 'twitter:card', content: 'summary_large_image' })
-    }
-    return {
-      title: 'ことばパレット',
-      meta: meta
-    }
-  },
-  methods: {
-    getColors: async function(){
-      if(this.word.length == 0) return;
-      this.$nuxt.$loading.start()
-      try {
-        const ret = await fetch('/api/getColors?word=' + this.word)
-        const retJson = await ret.json()
-        if(retJson.error) throw Error(retJson.error)
-        this.colors = Object.keys(retJson).map(key => retJson[key].rgb)
-      } catch (error) {
-        console.log(error)
-        this.$toast.error('エラーになりました : ' + error)
-      }
-      this.$nuxt.$loading.finish()
-    },
-    share: async function(){
-      const canvas = document.createElement("canvas")
-      canvas.height = 630
-      canvas.width = 1200
-      const ctx = canvas.getContext("2d")
-      ctx.fillStyle = `rgb(255,255,255)`
-      ctx.fillRect(0,0,1200,630);
-      ctx.fillStyle = `rgb(0,0,0)`
-      ctx.font = "150px sans-serif"
-      const wid = ctx.measureText(this.word)
-      ctx.fillText(this.word, Math.max((800-wid.width)/2+200,200), 250, 800)
-      const rgb2code = (rgb) => {
-        if(rgb[0] == -1) return ''
-        return "#" + Math.floor((1 << 24) + (rgb[0] << 16) + (rgb[1] << 8) + rgb[2]).toString(16).slice(1);
-      }
-      ctx.font = "20px sans-serif"
-      for(var i=0;i<6;i++){
-        ctx.fillStyle = `rgb(${this.colors[i].join(',')})`;
-        ctx.fillRect(175+i*150,350,100,100);
-        ctx.fillStyle = `rgb(0,0,0)`
-        ctx.fillText(rgb2code(this.colors[i]), 175+i*150,480,100)
-      }
-      const formData = new FormData();
-      const getCanvasBlob = (canvas) => {
-        return new Promise((resolve, reject) => canvas.toBlob(resolve, 'image/png'))
-      }
-      formData.append('image', await getCanvasBlob(canvas));
-      const options = {
-        method: 'POST',
-        body: formData
-      }
-      try {
-        const ret = await fetch('/api/saveOgpImage', options);
-        const retJson = await ret.json()
-        if(retJson.error) throw Error(retJson.error)
-        const rgb2hex = (rgb) => {
-          if(rgb[0] == -1) return ''
-          return Math.floor((1 << 24) + (rgb[0] << 16) + (rgb[1] << 8) + rgb[2]).toString(16).slice(1);
-        }
-        const tweetLink = twitterShare({
-          text: `ことばパレットで「${this.word}」の色を調べてみました。 #kotoba_palette`,
-          url: `https://kotoba-palette.herokuapp.com?id=${retJson.id}&word=${encodeURIComponent(this.word)}&colors=${this.colors.map(rgb2hex).join(',')}`,
-        });
-        if(!window.open(tweetLink)) window.location.href = tweetLink;
-      } catch (error) {
-        console.log(error)
-        this.$toast.error('エラーになりました : ' + error)
-      }
-      this.$nuxt.$loading.finish()
-    }
+// IDがある場合はKVからデータを復元
+let initialWord = queryWord;
+let initialColors: Array<[number, number, number]> = [];
+
+if (queryId) {
+  const { data } = await useAsyncData(`result-${queryId}`, () =>
+    $fetch<{ word: string; colors: Array<[number, number, number]> }>("/api/getResult", {
+      query: { id: queryId },
+    }),
+  );
+  if (data.value) {
+    initialWord = data.value.word;
+    initialColors = data.value.colors;
+  }
+}
+
+const word = ref(initialWord);
+const colors = ref<Array<[number, number, number]>>(initialColors);
+const resultId = ref(queryId);
+
+// OGP
+const siteUrl = "https://kotoba-palette.takanakahiko.me";
+
+const ogMeta: Array<{ property: string; content: string }> = [
+  { property: "og:site_name", content: "あなたが好きなものは，どんな色をしてますか？" },
+  { property: "og:type", content: "website" },
+  { property: "og:url", content: siteUrl },
+  { property: "og:title", content: "ことばパレット" },
+  { property: "og:description", content: "あなたが好きなものは，どんな色をしてますか？" },
+];
+
+if (queryId) {
+  ogMeta.push({ property: "og:image", content: `${siteUrl}/api/ogImage?id=${queryId}` });
+}
+
+useHead({
+  title: "ことばパレット",
+  meta: ogMeta,
+});
+
+// URLクエリパラメータにwordのみがある場合は自動検索
+if (queryWord && !queryId) {
+  getColors();
+}
+
+async function getColors() {
+  if (word.value.length === 0) return;
+  loading.value = true;
+  try {
+    const ret = await $fetch<{ colors: Array<[number, number, number]>; resultId: string }>("/api/getColors", {
+      query: { word: word.value },
+    });
+    colors.value = ret.colors;
+    resultId.value = ret.resultId ?? "";
+  } catch (error: unknown) {
+    console.log(error);
+    const e = error as { data?: { message?: string }; message?: string };
+    const msg = e?.data?.message || e?.message || String(error);
+    toast.error(msg);
+  } finally {
+    loading.value = false;
+  }
+}
+
+function share() {
+  const shareUrl = `${siteUrl}?id=${resultId.value}`;
+  const text = encodeURIComponent(`ことばパレットで「${word.value}」の色を調べてみました。 #kotoba_palette`);
+  const tweetLink = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(shareUrl)}`;
+
+  if (!window.open(tweetLink)) {
+    window.location.href = tweetLink;
   }
 }
 </script>
 
 <style lang="scss" scoped>
-@import "~/assets/display.scss";
+@use "~/assets/display.scss" as *;
 
 input {
-  border: 0;
-  border-bottom: 2px solid #5B5B5B;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
   width: 70%;
   font-size: 30px;
   line-height: 35px;
@@ -172,7 +140,7 @@ input::placeholder {
 
 .container {
   margin: 0 auto;
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -180,16 +148,16 @@ input::placeholder {
 }
 
 .title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   display: block;
-  font-weight: 300;
-  font-size: 5rem;
+  margin: 0 0 10px;
+}
+
+.logo {
+  width: 550px;
+  height: auto;
   @include mobile {
-    font-size: 2rem;
+    width: 300px;
   }
-  color: #35495e;
-  letter-spacing: 1px;
 }
 
 .subtitle {
@@ -200,7 +168,52 @@ input::placeholder {
   padding-bottom: 15px;
 }
 
+.search-form {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.search-button {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 30px;
+  padding: 0 15px;
+  @include mobile {
+    font-size: 15px;
+    padding: 0 10px;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: #f0f0f0;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+}
+
 .links {
   padding-top: 15px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #ccc;
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>

@@ -1,0 +1,18 @@
+interface AppEnv {
+  KV: KVNamespace | null;
+  BRAVE_API_KEY: string;
+}
+
+/**
+ * Cloudflare Workers 上では event.context.cloudflare.env から取得し、
+ * ローカル開発時は process.env にフォールバックする。
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getEnv(event: { context: any }): AppEnv {
+  const cf = event.context.cloudflare?.env;
+
+  return {
+    KV: cf?.KV ?? null,
+    BRAVE_API_KEY: cf?.BRAVE_API_KEY ?? process.env.BRAVE_API_KEY ?? "",
+  };
+}

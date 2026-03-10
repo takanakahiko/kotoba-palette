@@ -88,3 +88,16 @@ sw.*
 .DS_Store
 
 .envrc
+
+# Nuxt 3
+.output
+
+# Wrangler
+.wrangler
+
+# Debug/screenshot files
+debug-*.png
+screenshot-*.png
+
+# Playwright MCP
+.playwright-mcp/

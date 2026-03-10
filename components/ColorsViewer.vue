@@ -1,38 +1,39 @@
 <template>
   <div id="image-picker-palette" :class="{ active: isActive }">
-    <div v-for="rgb in value" :key="rgb | rgb2code" :style="rgb | rgb2style">
-      <span class="image-picker-palette-hex" >{{ rgb | rgb2code }}</span>
+    <div
+      v-for="(rgb, index) in value"
+      :key="index"
+      :style="rgb2style(rgb)"
+    >
+      <span class="image-picker-palette-hex">{{ rgb2code(rgb) }}</span>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    value: {
-      default: () => []
-    }
-  },
-  filters: {
-    rgb2code: function(rgb){
-      if(rgb[0] == -1) return ''
-      return "#" + Math.floor((1 << 24) + (rgb[0] << 16) + (rgb[1] << 8) + rgb[2]).toString(16).slice(1);
-    },
-    rgb2style: function(rgb){
-      if(rgb[0] == -1) return `background: rgb(255, 255, 255);`
-      return `color:${(rgb[0]+rgb[1]+rgb[2])/3 > 128 ? 'black' : 'white'}; background: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]});`
-    },
-  },
-  computed: {
-    isActive(){
-      return this.value && this.value.length !== 0
-    }
-  }
+<script setup lang="ts">
+import { computed } from "vue";
+import { rgb2hex } from "~/utils/color";
+
+const props = defineProps<{
+  value: Array<[number, number, number]>;
+}>();
+
+const isActive = computed(() => props.value && props.value.length > 0);
+
+function rgb2code(rgb: [number, number, number]): string {
+  if (rgb[0] === -1) return "";
+  return `#${rgb2hex(rgb)}`;
+}
+
+function rgb2style(rgb: [number, number, number]): string {
+  if (rgb[0] === -1) return "background: rgb(255, 255, 255);";
+  const textColor = (rgb[0] + rgb[1] + rgb[2]) / 3 > 128 ? "black" : "white";
+  return `color:${textColor}; background: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]});`;
 }
 </script>
 
 <style lang="scss" scoped>
-@import "~/assets/display.scss";
+@use "~/assets/display.scss" as *;
 
 #image-picker-palette {
   margin: 5px;
