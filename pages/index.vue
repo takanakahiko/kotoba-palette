@@ -39,8 +39,9 @@ let initialWord = queryWord;
 let initialColors: Array<[number, number, number]> = [];
 
 if (queryId) {
+  const requestFetch = useRequestFetch();
   const { data } = await useAsyncData(`result-${queryId}`, () =>
-    $fetch<{ word: string; colors: Array<[number, number, number]> }>("/api/getResult", {
+    requestFetch<{ word: string; colors: Array<[number, number, number]> }>("/api/getResult", {
       query: { id: queryId },
     }),
   );
