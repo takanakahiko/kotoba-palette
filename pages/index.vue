@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useToast } from "~/composables/useToast";
 
 const route = useRoute();
@@ -53,6 +53,26 @@ if (queryId) {
 const word = ref(initialWord);
 const colors = ref<Array<[number, number, number]>>(initialColors);
 const resultId = ref(queryId);
+
+// SSRでデータ取得に失敗した場合、クライアント側でフォールバック取得する
+onMounted(async () => {
+  if (queryId && colors.value.length === 0) {
+    loading.value = true;
+    try {
+      const result = await $fetch<{ word: string; colors: Array<[number, number, number]> }>("/api/getResult", {
+        query: { id: queryId },
+      });
+      if (result) {
+        word.value = result.word;
+        colors.value = result.colors;
+      }
+    } catch (e) {
+      console.error("Failed to load shared result:", e);
+    } finally {
+      loading.value = false;
+    }
+  }
+});
 
 // OGP
 const siteUrl = "https://kotoba-palette.takanakahiko.me";
