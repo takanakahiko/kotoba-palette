@@ -57,12 +57,13 @@ const resultId = ref(queryId);
 // OGP
 const siteUrl = "https://kotoba-palette.takanakahiko.me";
 
-const ogMeta: Array<{ property: string; content: string }> = [
+const ogMeta: Array<{ property?: string; name?: string; content: string }> = [
   { property: "og:site_name", content: "あなたが好きなものは，どんな色をしてますか？" },
   { property: "og:type", content: "website" },
   { property: "og:url", content: siteUrl },
   { property: "og:title", content: "ことばパレット" },
   { property: "og:description", content: "あなたが好きなものは，どんな色をしてますか？" },
+  { name: "twitter:card", content: "summary_large_image" },
 ];
 
 if (queryId) {
