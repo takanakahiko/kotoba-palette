@@ -1,0 +1,14 @@
+name = "kotoba-palette"
+main = ".output/server/index.mjs"
+find_additional_modules = true
+assets = { directory = ".output/public/", binding = "ASSETS" }
+compatibility_date = "2025-07-15"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# BRAVE_API_KEY is set via `wrangler secret put BRAVE_API_KEY`
+
+[[kv_namespaces]]
+binding = "KV"
+id = "dbb2e66cd6434e6281f8c661e489a1cb"
+preview_id = "6f109505b8064102869ae80f0eeadb62"

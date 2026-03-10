@@ -1,11 +1,12 @@
 <template>
   <div>
-    <nuxt />
+    <slot />
+    <ToastContainer />
   </div>
 </template>
 
 <style lang="scss">
-@import "~/assets/display.scss";
+@use "~/assets/display.scss" as *;
 
 html {
   font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
@@ -26,19 +27,27 @@ html {
   margin: 0;
 }
 
-.button--green {
+.button--green,
+.button--grey {
   -webkit-appearance: none;
   appearance: none;
   display: inline-block;
   border-radius: 4px;
-  border: 1px solid #3b8070;
-  color: #3b8070;
   cursor: pointer;
   background-color: transparent;
+  text-decoration: none;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
   padding: 10px 30px;
   @include mobile {
     padding: 5px 15px;
   }
+}
+
+.button--green {
+  border: 1px solid #3b8070;
+  color: #3b8070;
 }
 
 .button--green:hover {
@@ -47,15 +56,8 @@ html {
 }
 
 .button--grey {
-  display: inline-block;
-  border-radius: 4px;
   border: 1px solid #35495e;
   color: #35495e;
-  text-decoration: none;
-  padding: 10px 30px;
-  @include mobile {
-    padding: 5px 15px;
-  }
   margin-left: 15px;
 }
 

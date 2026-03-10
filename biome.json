@@ -1,0 +1,23 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
+  "files": {
+    "includes": ["**", "!!**/.nuxt", "!!**/dist", "!!**/.output"]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "lineWidth": 120
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.vue"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    }
+  ]
+}
