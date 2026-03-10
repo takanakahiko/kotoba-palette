@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { useToast } from "~/composables/useToast";
 
 const route = useRoute();
@@ -34,30 +34,47 @@ const loading = ref(false);
 const queryId = (route.query.id as string) || "";
 const queryWord = route.query.word ? decodeURIComponent(route.query.word as string) : "";
 
-const word = ref(queryWord);
-const colors = ref<Array<[number, number, number]>>([]);
-const resultId = ref(queryId);
+let initialWord = queryWord;
+let initialColors: Array<[number, number, number]> = [];
 
-// IDがある場合はクライアント側でKVからデータを復元
-onMounted(async () => {
-  if (queryId) {
-    loading.value = true;
-    try {
-      const result = await $fetch<{ word: string; colors: Array<[number, number, number]> }>("/api/getResult", {
-        query: { id: queryId },
-      });
-      if (result) {
-        word.value = result.word;
-        colors.value = result.colors;
+// IDがある場合はKVからデータを復元
+if (queryId) {
+  const { data } = await useAsyncData(`result-${queryId}`, async () => {
+    if (import.meta.server) {
+      // SSR時: useRequestEventで直接KVにアクセス（$fetchの内部呼び出しを回避）
+      const event = useRequestEvent();
+      const kv = event?.context?.cloudflare?.env?.KV as
+        | { get: (key: string) => Promise<string | null> }
+        | undefined;
+      if (kv) {
+        const raw = await kv.get(`result:${queryId}`);
+        if (raw) {
+          const parsed = JSON.parse(raw) as { word: string; colors: string };
+          const colors = parsed.colors.split(",").map((hex: string): [number, number, number] => {
+            const r = parseInt(hex.slice(0, 2), 16);
+            const g = parseInt(hex.slice(2, 4), 16);
+            const b = parseInt(hex.slice(4, 6), 16);
+            return [r, g, b];
+          });
+          return { word: parsed.word, colors };
+        }
       }
-    } catch (e) {
-      console.error("Failed to load shared result:", e);
-      toast.error("共有データの読み込みに失敗しました");
-    } finally {
-      loading.value = false;
+      return null;
     }
+    // クライアント時: HTTPリクエストでAPIを呼ぶ
+    return $fetch<{ word: string; colors: Array<[number, number, number]> }>("/api/getResult", {
+      query: { id: queryId },
+    });
+  });
+  if (data.value) {
+    initialWord = data.value.word;
+    initialColors = data.value.colors;
   }
-});
+}
+
+const word = ref(initialWord);
+const colors = ref<Array<[number, number, number]>>(initialColors);
+const resultId = ref(queryId);
 
 // OGP
 const siteUrl = "https://kotoba-palette.takanakahiko.me";
