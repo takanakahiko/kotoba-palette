@@ -17,7 +17,7 @@ export default defineNuxtConfig({
     head: {
       charset: "utf-8",
       viewport: "width=device-width, initial-scale=1, maximum-scale=1",
-      title: "ことばパレット",
+      title: "ことのはパレット",
       meta: [{ name: "description", content: "あなたが好きなものは，どんな色をしてますか？" }],
       link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
     },

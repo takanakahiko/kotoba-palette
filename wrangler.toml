@@ -1,4 +1,4 @@
-name = "kotoba-palette"
+name = "kotonoha-palette"
 main = ".output/server/index.mjs"
 find_additional_modules = true
 assets = { directory = ".output/public/", binding = "ASSETS" }
