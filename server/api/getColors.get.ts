@@ -21,7 +21,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const env = getEnv(event);
-  const useCache = !process.env.DISABLE_CACHE && env.KV;
+  const disableCache = process.env.DISABLE_CACHE || event.context.cloudflare?.env?.DISABLE_CACHE;
+  const useCache = !disableCache && env.KV;
 
   // キャッシュチェック（前後空白を除去して正規化）
   const cacheKey = `colors:${word.trim()}`;

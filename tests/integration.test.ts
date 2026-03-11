@@ -140,6 +140,7 @@ describe("Integration Tests", () => {
     serverProcess = spawn("npx", ["wrangler", "dev", "--port", PORT, ...varArgs], {
       cwd: projectRoot,
       stdio: "pipe",
+      detached: true,
     });
 
     serverProcess.stderr?.on("data", (data: Buffer) => {
@@ -152,9 +153,13 @@ describe("Integration Tests", () => {
   });
 
   after(() => {
-    if (serverProcess) {
+    if (serverProcess?.pid) {
       console.log("Stopping server...");
-      serverProcess.kill("SIGTERM");
+      try {
+        process.kill(-serverProcess.pid, "SIGKILL");
+      } catch {
+        serverProcess.kill("SIGKILL");
+      }
       serverProcess = null;
     }
     if (mockServer) {
