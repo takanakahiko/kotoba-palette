@@ -8,7 +8,7 @@ interface AppEnv {
  * Cloudflare Workers 上では event.context.cloudflare.env から取得し、
  * ローカル開発時は process.env にフォールバックする。
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: Nitro event context type
 export function getEnv(event: { context: any }): AppEnv {
   const cf = event.context.cloudflare?.env;
 
