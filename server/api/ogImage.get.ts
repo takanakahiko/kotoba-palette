@@ -3,9 +3,7 @@ import { getEnv } from "../utils/env";
 export default defineEventHandler(async (event) => {
   // Load logo SVG from server/assets
   const logoSvg = await useStorage("assets:server").getItem<string>("logo.svg");
-  const logoDataUri = logoSvg
-    ? `data:image/svg+xml;base64,${Buffer.from(logoSvg).toString("base64")}`
-    : "";
+  const logoDataUri = logoSvg ? `data:image/svg+xml;base64,${Buffer.from(logoSvg).toString("base64")}` : "";
 
   const query = getQuery(event);
   const id = query.id;

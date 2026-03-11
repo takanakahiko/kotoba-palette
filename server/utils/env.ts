@@ -8,8 +8,7 @@ interface AppEnv {
  * Cloudflare Workers 上では event.context.cloudflare.env から取得し、
  * ローカル開発時は process.env にフォールバックする。
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getEnv(event: { context: any }): AppEnv {
+export function getEnv(event: { context: Record<string, unknown> }): AppEnv {
   const cf = event.context.cloudflare?.env;
 
   return {
