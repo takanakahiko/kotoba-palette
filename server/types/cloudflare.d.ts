@@ -6,6 +6,7 @@ declare module "h3" {
       env: {
         KV: KVNamespace;
         BRAVE_API_KEY: string;
+        BRAVE_API_BASE_URL?: string;
       };
     };
   }
@@ -19,5 +20,6 @@ declare module "upng-js" {
   }
   function decode(buf: ArrayBuffer): Image;
   function toRGBA8(img: Image): ArrayBuffer[];
-  export { decode, toRGBA8, Image };
+  function encode(imgs: ArrayBuffer[], w: number, h: number, cnum: number): ArrayBuffer;
+  export { decode, toRGBA8, encode, Image };
 }

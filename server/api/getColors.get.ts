@@ -40,9 +40,7 @@ export default defineEventHandler(async (event) => {
   // レートリミットチェック＋カウント（キャッシュミス時のみ）
   await consumeRateLimit(env.KV);
 
-  const imageUrls = await imageSearch(word, {
-    BRAVE_API_KEY: env.BRAVE_API_KEY,
-  });
+  const imageUrls = await imageSearch(word, env);
 
   if (imageUrls.length === 0) {
     throw createError({ status: 404, message: "No images found" });

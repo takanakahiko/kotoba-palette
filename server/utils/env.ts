@@ -1,6 +1,7 @@
 interface AppEnv {
   KV: KVNamespace | null;
-  BRAVE_API_KEY: string;
+  BRAVE_API_KEY?: string;
+  BRAVE_API_BASE_URL?: string;
 }
 
 /**
@@ -13,6 +14,7 @@ export function getEnv(event: { context: any }): AppEnv {
 
   return {
     KV: cf?.KV ?? null,
-    BRAVE_API_KEY: cf?.BRAVE_API_KEY ?? process.env.BRAVE_API_KEY ?? "",
+    BRAVE_API_KEY: cf?.BRAVE_API_KEY ?? process.env.BRAVE_API_KEY,
+    BRAVE_API_BASE_URL: cf?.BRAVE_API_BASE_URL ?? process.env.BRAVE_API_BASE_URL,
   };
 }

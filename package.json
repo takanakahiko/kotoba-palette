@@ -9,7 +9,9 @@
     "dev": "nuxt dev",
     "build": "nuxt build && node scripts/fix-wasm-paths.mjs",
     "preview": "wrangler dev",
-    "test": "DISABLE_CACHE=1 node --test --import jiti/register server/utils/extractColors.test.ts",
+    "test": "npm run test:colors && npm run test:integration",
+    "test:colors": "DISABLE_CACHE=1 node --env-file-if-exists=.env --test --import jiti/register tests/colors.test.ts",
+    "test:integration": "node --test --test-timeout=300000 --import jiti/register tests/integration.test.ts",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write ."
