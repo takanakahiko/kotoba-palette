@@ -1,8 +1,8 @@
-# ことばパレット
+# ことのはパレット
 
 > あなたが好きなものは，どんな色をしてますか？
 
-![momoyan](https://raw.githubusercontent.com/takanakahiko/kotoba-palette/master/momoyan.png?)
+![momoyan](https://raw.githubusercontent.com/takanakahiko/kotonoha-palette/master/momoyan.png?)
 
 ## develop || build || install
 

@@ -499,7 +499,7 @@ export function extractColorsFromImage(image: DecodedImage): {
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 
 const FETCH_HEADERS = {
-  "User-Agent": "KotobaPaletteBot/2.0 (+https://github.com/takanakahiko/kotoba-palette)",
+  "User-Agent": "KotobaPaletteBot/2.0 (+https://github.com/takanakahiko/kotonoha-palette)",
 };
 
 export async function extractColors(imageUrl: string): Promise<ColorEntry[]> {

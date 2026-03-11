@@ -2,7 +2,7 @@
   <div class="container">
     <ForkMeOnGithub />
     <div>
-      <h1 class="title"><img src="/logo.svg" alt="ことばパレット" class="logo" /></h1>
+      <h1 class="title"><img src="/logo.svg" alt="ことのはパレット" class="logo" /></h1>
       <form @submit.prevent="getColors" class="search-form">
         <input type="text" placeholder="言葉を入力" v-model="word" />
         <button type="submit" class="search-button" :disabled="!word || loading">
@@ -56,13 +56,13 @@ const colors = ref<Array<[number, number, number]>>(initialColors);
 const resultId = ref(queryId);
 
 // OGP
-const siteUrl = "https://kotoba-palette.takanakahiko.me";
+const siteUrl = "https://kotonoha-palette.takanakahiko.me";
 
 const ogMeta: Array<{ property?: string; name?: string; content: string }> = [
   { property: "og:site_name", content: "あなたが好きなものは，どんな色をしてますか？" },
   { property: "og:type", content: "website" },
   { property: "og:url", content: siteUrl },
-  { property: "og:title", content: "ことばパレット" },
+  { property: "og:title", content: "ことのはパレット" },
   { property: "og:description", content: "あなたが好きなものは，どんな色をしてますか？" },
   { name: "twitter:card", content: "summary_large_image" },
 ];
@@ -72,7 +72,7 @@ if (queryId) {
 }
 
 useHead({
-  title: "ことばパレット",
+  title: "ことのはパレット",
   meta: ogMeta,
 });
 
@@ -102,7 +102,7 @@ async function getColors() {
 
 function share() {
   const shareUrl = `${siteUrl}?id=${resultId.value}`;
-  const text = encodeURIComponent(`ことばパレットで「${word.value}」の色を調べてみました。 #kotoba_palette`);
+  const text = encodeURIComponent(`ことのはパレットで「${word.value}」の色を調べてみました。 #kotonoha_palette`);
   const tweetLink = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(shareUrl)}`;
 
   if (!window.open(tweetLink)) {
