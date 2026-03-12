@@ -46,6 +46,7 @@ export default defineEventHandler(async (event) => {
 
   const perImage: PerImageResult[] = targetUrls.map((url, i) => {
     const r = results[i];
+    if (!r) return { url, status: "error" as const, error: "No result" };
     if (r.status === "fulfilled") {
       return {
         url,
@@ -70,7 +71,7 @@ export default defineEventHandler(async (event) => {
   if (palettes.length === 0) {
     aggregated = [];
   } else if (palettes.length === 1) {
-    aggregated = palettes[0].map((e) => e.color);
+    aggregated = palettes[0]?.map((e) => e.color) ?? [];
   } else {
     const debugResult = aggregateColorsDebug(palettes);
     aggregated = debugResult.colors;

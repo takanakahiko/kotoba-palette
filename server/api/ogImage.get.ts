@@ -31,10 +31,11 @@ export default defineEventHandler(async (event) => {
   });
   const css = await cssResponse.text();
   const fontUrlMatch = css.match(/url\(([^)]+)\)/);
-  if (!fontUrlMatch) {
+  const fontUrl = fontUrlMatch?.[1];
+  if (!fontUrl) {
     throw createError({ status: 500, message: "Failed to resolve font URL" });
   }
-  const fontResponse = await fetch(fontUrlMatch[1]);
+  const fontResponse = await fetch(fontUrl);
   const fontData = await fontResponse.arrayBuffer();
 
   const colorSwatches = hexColors.map((hex) => ({

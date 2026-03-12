@@ -1,3 +1,5 @@
+/// <reference types="@cloudflare/workers-types" />
+
 const DAILY_LIMIT = 1000;
 
 function todayKey(): string {
