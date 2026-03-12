@@ -104,9 +104,9 @@ async function getColors() {
 }
 
 function clearInput() {
-  word.value = '';
+  word.value = "";
   colors.value = [];
-  resultId.value = '';
+  resultId.value = "";
 }
 
 function share() {
