@@ -1,3 +1,5 @@
+/// <reference types="@cloudflare/workers-types" />
+
 interface AppEnv {
   KV: KVNamespace | null;
   BRAVE_API_KEY?: string;

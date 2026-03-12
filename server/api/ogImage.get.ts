@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
   if (!fontUrlMatch) {
     throw createError({ status: 500, message: "Failed to resolve font URL" });
   }
-  const fontResponse = await fetch(fontUrlMatch[1]);
+  const fontResponse = await fetch(fontUrlMatch[1]!);
   const fontData = await fontResponse.arrayBuffer();
 
   const colorSwatches = hexColors.map((hex) => ({
