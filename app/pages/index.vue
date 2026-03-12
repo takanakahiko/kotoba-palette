@@ -6,7 +6,7 @@
       <form @submit.prevent="getColors" class="search-form">
         <div class="input-wrapper">
           <input type="text" placeholder="言葉を入力" v-model="word" />
-          <button v-if="word" type="button" class="clear-button" @click="word = ''">✕</button>
+          <button v-if="word" type="button" class="clear-button" @click="clearInput">✕</button>
         </div>
         <button type="submit" class="search-button" :disabled="!word || loading">
           <span v-if="loading" class="spinner" />
@@ -101,6 +101,12 @@ async function getColors() {
   } finally {
     loading.value = false;
   }
+}
+
+function clearInput() {
+  word.value = '';
+  colors.value = [];
+  resultId.value = '';
 }
 
 function share() {
