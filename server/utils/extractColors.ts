@@ -118,8 +118,8 @@ function labDistSq(a: LAB, b: LAB): number {
 function findNearestIndex(lab: LAB, centroids: LAB[]): number {
   let minD = Infinity;
   let minIdx = 0;
-  for (let i = 0; i < centroids.length; i++) {
-    const d = labDistSq(lab, centroids[i]!);
+  for (const [i, centroid] of centroids.entries()) {
+    const d = labDistSq(lab, centroid);
     if (d < minD) {
       minD = d;
       minIdx = i;
@@ -224,10 +224,10 @@ function kMeans(pixels: WeightedPixel[], k: number, maxIterations: number = 20):
   for (let i = 1; i < k; i++) {
     let maxDist = -1;
     let maxIdx = 0;
-    for (let j = 0; j < labs.length; j++) {
+    for (const [j, lab] of labs.entries()) {
       let minD = Infinity;
       for (const c of centroids) {
-        const d = labDistSq(labs[j]!, c);
+        const d = labDistSq(lab, c);
         if (d < minD) minD = d;
       }
       if (minD > maxDist) {
@@ -243,24 +243,27 @@ function kMeans(pixels: WeightedPixel[], k: number, maxIterations: number = 20):
     const sums: LAB[] = Array.from({ length: k }, () => [0, 0, 0]);
     const counts = new Array<number>(k).fill(0);
 
-    for (let pi = 0; pi < labs.length; pi++) {
-      const ci = findNearestIndex(labs[pi]!, centroids);
-      sums[ci]![0] += labs[pi]![0];
-      sums[ci]![1] += labs[pi]![1];
-      sums[ci]![2] += labs[pi]![2];
+    for (const lab of labs) {
+      const ci = findNearestIndex(lab, centroids);
+      const sum = sums[ci]!;
+      sum[0] += lab[0];
+      sum[1] += lab[1];
+      sum[2] += lab[2];
       counts[ci]!++;
     }
 
     let converged = true;
-    for (let i = 0; i < k; i++) {
-      if (counts[i] === 0) continue;
-      const nL = sums[i]![0] / counts[i]!;
-      const na = sums[i]![1] / counts[i]!;
-      const nb = sums[i]![2] / counts[i]!;
+    for (const [i, centroid] of centroids.entries()) {
+      const count = counts[i]!;
+      if (count === 0) continue;
+      const sum = sums[i]!;
+      const nL = sum[0] / count;
+      const na = sum[1] / count;
+      const nb = sum[2] / count;
       if (
-        Math.abs(nL - centroids[i]![0]) > 0.1 ||
-        Math.abs(na - centroids[i]![1]) > 0.1 ||
-        Math.abs(nb - centroids[i]![2]) > 0.1
+        Math.abs(nL - centroid[0]) > 0.1 ||
+        Math.abs(na - centroid[1]) > 0.1 ||
+        Math.abs(nb - centroid[2]) > 0.1
       ) {
         converged = false;
         centroids[i] = [nL, na, nb];
@@ -272,8 +275,8 @@ function kMeans(pixels: WeightedPixel[], k: number, maxIterations: number = 20):
   // 最終割り当てでクラスタサイズ・中心率を計算
   const counts = new Array<number>(k).fill(0);
   const centerCounts = new Array<number>(k).fill(0);
-  for (let pi = 0; pi < labs.length; pi++) {
-    const ci = findNearestIndex(labs[pi]!, centroids);
+  for (const [pi, lab] of labs.entries()) {
+    const ci = findNearestIndex(lab, centroids);
     counts[ci]!++;
     if (pixels[pi]!.isCenter) centerCounts[ci]!++;
   }
@@ -569,10 +572,11 @@ function aggregateColorsInternal(palettes: ColorEntry[][], count: number = 6): A
     totalScore: 0,
   }));
 
-  for (let i = 0; i < scored.length; i++) {
+  for (const [i, s] of scored.entries()) {
     const gi = findNearestIndex(scoredLabs[i]!, centroidLabs);
-    groups[gi]!.colors.push(scored[i]!);
-    groups[gi]!.totalScore += scored[i]!.score;
+    const group = groups[gi]!;
+    group.colors.push(s);
+    group.totalScore += s.score;
   }
 
   const nonEmptyGroups = groups.filter((g) => g.colors.length > 0);
