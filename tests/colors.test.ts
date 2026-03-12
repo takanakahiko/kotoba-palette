@@ -1,19 +1,9 @@
 import assert from "node:assert";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, it } from "node:test";
-import { aggregateColors, type ColorEntry, extractColors, type RGB } from "./extractColors";
-import { imageSearch } from "./imageSearch";
+import { aggregateColors, type ColorEntry, extractColors, type RGB } from "../server/utils/extractColors";
+import { imageSearch } from "../server/utils/imageSearch";
 
-// .env からBRAVE_API_KEYを読み込む
-const envPath = resolve(import.meta.dirname, "../../.env");
-const envContent = readFileSync(envPath, "utf-8");
-const BRAVE_API_KEY =
-  envContent
-    .split("\n")
-    .find((l) => l.startsWith("BRAVE_API_KEY="))
-    ?.split("=")[1]
-    ?.trim() || "";
+const BRAVE_API_KEY = process.env.BRAVE_API_KEY || "";
 
 function toHex(c: RGB): string {
   return `#${c.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
@@ -34,12 +24,11 @@ async function getPaletteForWord(word: string): Promise<Array<RGB>> {
 
   const MAX_IMAGES = 5;
 
-  const results = await Promise.allSettled(imageUrls.map((url) => extractColors(url)));
+  const results = await Promise.allSettled(imageUrls.slice(0, MAX_IMAGES).map((url) => extractColors(url)));
 
   const palettes = results
     .filter((r): r is PromiseFulfilledResult<ColorEntry[]> => r.status === "fulfilled")
-    .map((r) => r.value)
-    .slice(0, MAX_IMAGES);
+    .map((r) => r.value);
 
   if (palettes.length === 0) throw new Error(`Failed to extract colors for "${word}"`);
 
@@ -114,7 +103,7 @@ const testCases: TestCase[] = [
   },
 ];
 
-describe("カラーパレット抽出", () => {
+describe("カラーパレット抽出", { skip: !BRAVE_API_KEY && "BRAVE_API_KEY が設定されていません" }, () => {
   for (const tc of testCases) {
     it(`「${tc.word}」のパレットに期待する色が含まれる`, async () => {
       const colors = await getPaletteForWord(tc.word);

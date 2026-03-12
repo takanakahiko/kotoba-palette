@@ -8,15 +8,19 @@ interface BraveImageResponse {
 
 const BLOCKED_DOMAINS = ["mercari.com", "res.costowns.com"];
 
-export async function imageSearch(word: string, env: { BRAVE_API_KEY: string }): Promise<string[]> {
+export async function imageSearch(
+  word: string,
+  env: { BRAVE_API_KEY?: string; BRAVE_API_BASE_URL?: string },
+): Promise<string[]> {
   const { BRAVE_API_KEY: apiKey } = env;
 
   if (!apiKey) {
     throw new Error("BRAVE_API_KEY must be set");
   }
 
+  const baseUrl = env.BRAVE_API_BASE_URL ?? "https://api.search.brave.com";
   const query = encodeURIComponent(word);
-  const url = `https://api.search.brave.com/res/v1/images/search?q=${query}&count=20&search_lang=jp&safesearch=off`;
+  const url = `${baseUrl}/res/v1/images/search?q=${query}&count=20&search_lang=jp&safesearch=off`;
 
   const res = await fetch(url, {
     headers: {
