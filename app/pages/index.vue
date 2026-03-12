@@ -4,7 +4,10 @@
     <div>
       <h1 class="title"><img src="/logo.svg" alt="ことのはパレット" class="logo" /></h1>
       <form @submit.prevent="getColors" class="search-form">
-        <input type="text" placeholder="言葉を入力" v-model="word" />
+        <div class="input-wrapper">
+          <input type="text" placeholder="言葉を入力" v-model="word" />
+          <button v-if="word" type="button" class="clear-button" @click="clearInput">✕</button>
+        </div>
         <button type="submit" class="search-button" :disabled="!word || loading">
           <span v-if="loading" class="spinner" />
           <span v-else>🎨</span>
@@ -100,6 +103,12 @@ async function getColors() {
   }
 }
 
+function clearInput() {
+  word.value = "";
+  colors.value = [];
+  resultId.value = "";
+}
+
 function share() {
   const shareUrl = `${siteUrl}?id=${resultId.value}`;
   const text = encodeURIComponent(`ことのはパレットで「${word.value}」の色を調べてみました。 #kotonoha_palette`);
@@ -114,10 +123,15 @@ function share() {
 <style lang="scss" scoped>
 @use "~/assets/display.scss" as *;
 
+.input-wrapper {
+  position: relative;
+  width: 70%;
+}
+
 input {
   border: 1px solid #CCCCCC;
   border-radius: 4px;
-  width: 70%;
+  width: 100%;
   font-size: 30px;
   line-height: 35px;
   height: 70px;
@@ -127,9 +141,38 @@ input {
     height: 35px;
   }
   text-align: center;
-  padding: 10px;
+  padding: 10px 40px 10px 10px;
+  @include mobile {
+    padding: 10px 30px 10px 10px;
+  }
   background: transparent;
   color: #5B5B5B;
+  box-sizing: border-box;
+}
+
+.clear-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  -webkit-appearance: none;
+  appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: #AAAAAA;
+  padding: 4px 8px;
+  line-height: 1;
+  @include mobile {
+    font-size: 14px;
+    right: 4px;
+    padding: 2px 4px;
+  }
+
+  &:hover {
+    color: #5B5B5B;
+  }
 }
 
 input:focus {
