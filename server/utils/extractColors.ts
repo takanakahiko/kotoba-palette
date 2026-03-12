@@ -53,7 +53,8 @@ export async function decodeImage(buffer: ArrayBuffer, contentType: string): Pro
   }
   if (contentType.includes("png")) {
     const img = UPNG.decode(buffer);
-    const rgba = UPNG.toRGBA8(img)[0]!;
+    const rgba = UPNG.toRGBA8(img)[0];
+    if (!rgba) throw new Error("Failed to decode PNG");
     return { width: img.width, height: img.height, data: new Uint8Array(rgba) };
   }
   const img = jpegJs.decode(new Uint8Array(buffer), { useTArray: true });
@@ -220,11 +221,13 @@ function kMeans(pixels: WeightedPixel[], k: number, maxIterations: number = 20):
   const labs = pixels.map((p) => rgbToLab(p.color));
 
   // Farthest-point initialization
-  const centroids: LAB[] = [[...labs[0]!]];
+  const firstLab = labs[0];
+  if (!firstLab) throw new Error("No pixels to cluster");
+  const centroids: LAB[] = [[...firstLab]];
   for (let i = 1; i < k; i++) {
     let maxDist = -1;
-    let maxIdx = 0;
-    for (const [j, lab] of labs.entries()) {
+    let farthest: LAB = firstLab;
+    for (const lab of labs) {
       let minD = Infinity;
       for (const c of centroids) {
         const d = labDistSq(lab, c);
@@ -232,10 +235,10 @@ function kMeans(pixels: WeightedPixel[], k: number, maxIterations: number = 20):
       }
       if (minD > maxDist) {
         maxDist = minD;
-        maxIdx = j;
+        farthest = lab;
       }
     }
-    centroids.push([...labs[maxIdx]!]);
+    centroids.push([...farthest]);
   }
 
   // 反復
@@ -245,26 +248,24 @@ function kMeans(pixels: WeightedPixel[], k: number, maxIterations: number = 20):
 
     for (const lab of labs) {
       const ci = findNearestIndex(lab, centroids);
-      const sum = sums[ci]!;
+      const sum = sums[ci];
+      if (!sum) continue;
       sum[0] += lab[0];
       sum[1] += lab[1];
       sum[2] += lab[2];
-      counts[ci]!++;
+      counts[ci] = (counts[ci] ?? 0) + 1;
     }
 
     let converged = true;
     for (const [i, centroid] of centroids.entries()) {
-      const count = counts[i]!;
+      const count = counts[i] ?? 0;
       if (count === 0) continue;
-      const sum = sums[i]!;
+      const sum = sums[i];
+      if (!sum) continue;
       const nL = sum[0] / count;
       const na = sum[1] / count;
       const nb = sum[2] / count;
-      if (
-        Math.abs(nL - centroid[0]) > 0.1 ||
-        Math.abs(na - centroid[1]) > 0.1 ||
-        Math.abs(nb - centroid[2]) > 0.1
-      ) {
+      if (Math.abs(nL - centroid[0]) > 0.1 || Math.abs(na - centroid[1]) > 0.1 || Math.abs(nb - centroid[2]) > 0.1) {
         converged = false;
         centroids[i] = [nL, na, nb];
       }
@@ -277,16 +278,16 @@ function kMeans(pixels: WeightedPixel[], k: number, maxIterations: number = 20):
   const centerCounts = new Array<number>(k).fill(0);
   for (const [pi, lab] of labs.entries()) {
     const ci = findNearestIndex(lab, centroids);
-    counts[ci]!++;
-    if (pixels[pi]!.isCenter) centerCounts[ci]!++;
+    counts[ci] = (counts[ci] ?? 0) + 1;
+    if (pixels[pi]?.isCenter) centerCounts[ci] = (centerCounts[ci] ?? 0) + 1;
   }
 
   const total = counts.reduce((a, b) => a + b, 0);
   return centroids
     .map((c, i) => ({
       color: labToRgb(c),
-      ratio: total > 0 ? counts[i]! / total : 0,
-      centerRatio: counts[i]! > 0 ? centerCounts[i]! / counts[i]! : 0,
+      ratio: total > 0 ? (counts[i] ?? 0) / total : 0,
+      centerRatio: (counts[i] ?? 0) > 0 ? (centerCounts[i] ?? 0) / (counts[i] ?? 1) : 0,
     }))
     .sort((a, b) => b.ratio - a.ratio);
 }
@@ -309,14 +310,14 @@ function sampleEdgePixels(image: DecodedImage): RGB[] {
     for (const y of [0, height - 1]) {
       const offset = (y * width + x) * 4;
       if (data[offset + 3] === 0) continue;
-      pixels.push([data[offset]!, data[offset + 1]!, data[offset + 2]!]);
+      pixels.push([data[offset] ?? 0, data[offset + 1] ?? 0, data[offset + 2] ?? 0]);
     }
   }
   for (let y = 0; y < height; y += step) {
     for (const x of [0, width - 1]) {
       const offset = (y * width + x) * 4;
       if (data[offset + 3] === 0) continue;
-      pixels.push([data[offset]!, data[offset + 1]!, data[offset + 2]!]);
+      pixels.push([data[offset] ?? 0, data[offset + 1] ?? 0, data[offset + 2] ?? 0]);
     }
   }
 
@@ -328,8 +329,9 @@ function findDominantEdgeColor(image: DecodedImage, minRatio: number): RGB | nul
   if (edgePixels.length < 10) return null;
 
   const clusters = kMeansRgb(edgePixels, 2);
-  if (clusters[0]!.ratio < minRatio) return null;
-  return clusters[0]!.color;
+  const dominant = clusters[0];
+  if (!dominant || dominant.ratio < minRatio) return null;
+  return dominant.color;
 }
 
 // --- 枠切り抜き ---
@@ -345,7 +347,7 @@ function isLineBorder(data: Uint8Array | Buffer, borderLab: LAB, offsets: Iterab
       match++;
       continue;
     }
-    const rgb: RGB = [data[offset]!, data[offset + 1]!, data[offset + 2]!];
+    const rgb: RGB = [data[offset] ?? 0, data[offset + 1] ?? 0, data[offset + 2] ?? 0];
     if (ciede2000(rgbToLab(rgb), borderLab) < BORDER_DELTA_E) {
       match++;
     }
@@ -433,10 +435,10 @@ function samplePixels(image: DecodedImage, maxPixels: number = 10000): WeightedP
 
   for (let i = 0; i < totalPixels; i += step) {
     const offset = i * 4;
-    const r = data[offset]!;
-    const g = data[offset + 1]!;
-    const b = data[offset + 2]!;
-    const a = data[offset + 3]!;
+    const r = data[offset] ?? 0;
+    const g = data[offset + 1] ?? 0;
+    const b = data[offset + 2] ?? 0;
+    const a = data[offset + 3] ?? 0;
     if (a === 0) continue;
 
     const x = i % width;
@@ -573,8 +575,11 @@ function aggregateColorsInternal(palettes: ColorEntry[][], count: number = 6): A
   }));
 
   for (const [i, s] of scored.entries()) {
-    const gi = findNearestIndex(scoredLabs[i]!, centroidLabs);
-    const group = groups[gi]!;
+    const lab = scoredLabs[i];
+    if (!lab) continue;
+    const gi = findNearestIndex(lab, centroidLabs);
+    const group = groups[gi];
+    if (!group) continue;
     group.colors.push(s);
     group.totalScore += s.score;
   }
@@ -585,10 +590,13 @@ function aggregateColorsInternal(palettes: ColorEntry[][], count: number = 6): A
   }
   nonEmptyGroups.sort((a, b) => b.totalScore - a.totalScore);
 
-  const colors = nonEmptyGroups.slice(0, count).map((g) => g.colors[0]!.color);
+  const colors = nonEmptyGroups
+    .slice(0, count)
+    .map((g) => g.colors[0]?.color)
+    .filter((c): c is RGB => c != null);
 
   const debugGroups: AggregateColorGroup[] = nonEmptyGroups.map((g, i) => ({
-    representative: g.colors[0]!.color,
+    representative: g.colors[0]?.color ?? ([0, 0, 0] as RGB),
     selected: i < count,
     totalScore: g.totalScore,
     colors: g.colors,

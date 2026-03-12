@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 500, message: "Failed to extract colors from any image" });
   }
 
-  const colors = palettes.length === 1 ? palettes[0]!.map((e) => e.color) : aggregateColors(palettes);
+  const colors = palettes.length === 1 ? (palettes[0]?.map((e) => e.color) ?? []) : aggregateColors(palettes);
 
   const resultId = crypto.randomUUID().replace(/-/g, "").slice(0, 12);
   const colorsHex = colors.map((c) => rgb2hex(c)).join(",");
