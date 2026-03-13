@@ -13,11 +13,11 @@ export default defineEventHandler(async (event) => {
   const word = query.word;
 
   if (!word || typeof word !== "string") {
-    throw createError({ status: 400, message: "word parameter is required" });
+    throw createError({ status: 400, message: "検索する言葉を入力してください。" });
   }
 
   if (word.length > MAX_WORD_LENGTH) {
-    throw createError({ status: 400, message: `word parameter must be ${MAX_WORD_LENGTH} characters or less` });
+    throw createError({ status: 400, message: `言葉は${MAX_WORD_LENGTH}文字以内で入力してください。` });
   }
 
   const env = getEnv(event);
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
   const imageUrls = await imageSearch(word, env);
 
   if (imageUrls.length === 0) {
-    throw createError({ status: 404, message: "No images found" });
+    throw createError({ status: 404, message: "画像が見つかりませんでした。別の言葉で試してみてください。" });
   }
 
   const MAX_IMAGES = 5;
@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
     .map((r) => r.value);
 
   if (palettes.length === 0) {
-    throw createError({ status: 500, message: "Failed to extract colors from any image" });
+    throw createError({ status: 500, message: "色の取得に失敗しました。しばらくしてからもう一度お試しください。" });
   }
 
   const colors = palettes.length === 1 ? (palettes[0]?.map((e) => e.color) ?? []) : aggregateColors(palettes);

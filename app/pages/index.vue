@@ -29,6 +29,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useToast } from "~/composables/useToast";
+import { extractErrorMessage } from "~/utils/error";
 
 const route = useRoute();
 const toast = useToast();
@@ -95,9 +96,7 @@ async function getColors() {
     resultId.value = ret.resultId ?? "";
   } catch (error: unknown) {
     console.log(error);
-    const e = error as { data?: { message?: string }; message?: string };
-    const msg = e?.data?.message || e?.message || String(error);
-    toast.error(msg);
+    toast.error(extractErrorMessage(error));
   } finally {
     loading.value = false;
   }
