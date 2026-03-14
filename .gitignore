@@ -99,5 +99,7 @@ sw.*
 debug-*.png
 screenshot-*.png
 
-# Playwright MCP
+# Playwright
 .playwright-mcp/
+test-results/
+playwright-report/
