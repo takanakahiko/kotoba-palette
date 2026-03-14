@@ -41,7 +41,12 @@ export default defineEventHandler(async (event) => {
   // レートリミットチェック＋カウント（キャッシュミス時のみ）
   await consumeRateLimit(env.KV);
 
-  const imageUrls = await imageSearch(word, env);
+  let imageUrls: string[];
+  try {
+    imageUrls = await imageSearch(word, env);
+  } catch {
+    throw createError({ status: 502, message: "画像検索サービスに接続できませんでした。しばらくしてからもう一度お試しください。" });
+  }
 
   if (imageUrls.length === 0) {
     throw createError({ status: 404, message: "画像が見つかりませんでした。別の言葉で試してみてください。" });
