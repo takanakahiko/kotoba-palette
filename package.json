@@ -12,6 +12,7 @@
     "test": "npm run test:colors && npm run test:integration",
     "test:colors": "DISABLE_CACHE=1 node --env-file-if-exists=.env --test --import jiti/register tests/colors.test.ts",
     "test:integration": "node --test --test-timeout=300000 --import jiti/register tests/integration.test.ts",
+    "test:e2e": "npx playwright test",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write ."
@@ -26,6 +27,7 @@
     "@biomejs/biome": "2.4.6",
     "@cloudflare/workers-types": "^4.20260312.1",
     "@nuxt/fonts": "^0.14.0",
+    "@playwright/test": "^1.58.2",
     "nuxt": "^4.3.1",
     "sass": "^1.98.0",
     "typescript": "^5.9.3",
