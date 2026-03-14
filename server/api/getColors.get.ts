@@ -45,7 +45,10 @@ export default defineEventHandler(async (event) => {
   try {
     imageUrls = await imageSearch(word, env);
   } catch {
-    throw createError({ status: 502, message: "画像検索サービスに接続できませんでした。しばらくしてからもう一度お試しください。" });
+    throw createError({
+      status: 502,
+      message: "画像検索サービスに接続できませんでした。しばらくしてからもう一度お試しください。",
+    });
   }
 
   if (imageUrls.length === 0) {
