@@ -44,7 +44,8 @@ export default defineEventHandler(async (event) => {
   let imageUrls: string[];
   try {
     imageUrls = await imageSearch(word, env);
-  } catch {
+  } catch (e) {
+    console.error("[getColors] imageSearch failed:", e);
     throw createError({
       status: 502,
       message: "画像検索サービスに接続できませんでした。しばらくしてからもう一度お試しください。",
@@ -60,11 +61,20 @@ export default defineEventHandler(async (event) => {
   // 先にスライスしてから処理（不要な画像ダウンロードを避ける）
   const results = await Promise.allSettled(imageUrls.slice(0, MAX_IMAGES).map((url) => extractColors(url)));
 
+  const rejected = results.filter((r): r is PromiseRejectedResult => r.status === "rejected");
+  if (rejected.length > 0) {
+    console.error(
+      `[getColors] extractColors failed for ${rejected.length}/${results.length} images:`,
+      rejected.map((r) => r.reason),
+    );
+  }
+
   const palettes = results
     .filter((r): r is PromiseFulfilledResult<ColorEntry[]> => r.status === "fulfilled")
     .map((r) => r.value);
 
   if (palettes.length === 0) {
+    console.error("[getColors] All images failed, no palettes extracted");
     throw createError({ status: 500, message: "色の取得に失敗しました。しばらくしてからもう一度お試しください。" });
   }
 
