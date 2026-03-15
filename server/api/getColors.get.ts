@@ -13,11 +13,11 @@ export default defineEventHandler(async (event) => {
   const word = query.word;
 
   if (!word || typeof word !== "string") {
-    throw createError({ status: 400, message: "word parameter is required" });
+    throw createError({ status: 400, message: "検索する言葉を入力してください。" });
   }
 
   if (word.length > MAX_WORD_LENGTH) {
-    throw createError({ status: 400, message: `word parameter must be ${MAX_WORD_LENGTH} characters or less` });
+    throw createError({ status: 400, message: `言葉は${MAX_WORD_LENGTH}文字以内で入力してください。` });
   }
 
   const env = getEnv(event);
@@ -41,10 +41,19 @@ export default defineEventHandler(async (event) => {
   // レートリミットチェック＋カウント（キャッシュミス時のみ）
   await consumeRateLimit(env.KV);
 
-  const imageUrls = await imageSearch(word, env);
+  let imageUrls: string[];
+  try {
+    imageUrls = await imageSearch(word, env);
+  } catch (e) {
+    console.error("[getColors] imageSearch failed:", e);
+    throw createError({
+      status: 502,
+      message: "画像検索サービスに接続できませんでした。しばらくしてからもう一度お試しください。",
+    });
+  }
 
   if (imageUrls.length === 0) {
-    throw createError({ status: 404, message: "No images found" });
+    throw createError({ status: 404, message: "画像が見つかりませんでした。別の言葉で試してみてください。" });
   }
 
   const MAX_IMAGES = 5;
@@ -52,12 +61,21 @@ export default defineEventHandler(async (event) => {
   // 先にスライスしてから処理（不要な画像ダウンロードを避ける）
   const results = await Promise.allSettled(imageUrls.slice(0, MAX_IMAGES).map((url) => extractColors(url)));
 
+  const rejected = results.filter((r): r is PromiseRejectedResult => r.status === "rejected");
+  if (rejected.length > 0) {
+    console.error(
+      `[getColors] extractColors failed for ${rejected.length}/${results.length} images:`,
+      rejected.map((r) => r.reason),
+    );
+  }
+
   const palettes = results
     .filter((r): r is PromiseFulfilledResult<ColorEntry[]> => r.status === "fulfilled")
     .map((r) => r.value);
 
   if (palettes.length === 0) {
-    throw createError({ status: 500, message: "Failed to extract colors from any image" });
+    console.error("[getColors] All images failed, no palettes extracted");
+    throw createError({ status: 500, message: "色の取得に失敗しました。しばらくしてからもう一度お試しください。" });
   }
 
   const colors = palettes.length === 1 ? (palettes[0]?.map((e) => e.color) ?? []) : aggregateColors(palettes);

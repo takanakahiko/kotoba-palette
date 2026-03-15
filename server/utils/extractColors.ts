@@ -423,7 +423,7 @@ function stripBorder(image: DecodedImage): { image: DecodedImage; borderColor: R
 
 // --- ピクセルサンプリング ---
 
-function samplePixels(image: DecodedImage, maxPixels: number = 10000): WeightedPixel[] {
+function samplePixels(image: DecodedImage, maxPixels: number = 3000): WeightedPixel[] {
   const { width, height, data } = image;
   const totalPixels = width * height;
   const step = Math.max(1, Math.floor(totalPixels / maxPixels));

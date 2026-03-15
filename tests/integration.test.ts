@@ -177,7 +177,7 @@ describe("Integration Tests", () => {
       const res = await fetchApiRaw("/api/getColors");
       assert.strictEqual(res.status, 400);
       const body = await res.json();
-      assert.ok((body as { message: string }).message.includes("word"));
+      assert.ok((body as { message: string }).message.includes("言葉"));
     });
 
     it("wordが空文字で400を返す", async () => {
@@ -190,7 +190,7 @@ describe("Integration Tests", () => {
       const res = await fetchApiRaw("/api/getColors", { word: longWord });
       assert.strictEqual(res.status, 400);
       const body = await res.json();
-      assert.ok((body as { message: string }).message.includes("100"));
+      assert.ok((body as { message: string }).message.includes("100文字以内"));
     });
   });
 

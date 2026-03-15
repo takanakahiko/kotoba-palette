@@ -8,6 +8,10 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 # BRAVE_API_KEY is set via `wrangler secret put BRAVE_API_KEY`
 
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 [[kv_namespaces]]
 binding = "KV"
 id = "dbb2e66cd6434e6281f8c661e489a1cb"
